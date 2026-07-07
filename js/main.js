@@ -11,21 +11,27 @@ const config = {
   mouseForce: 100,
   windForce: 0.05,
   animationSpeed: 1,
+  glowIntensity: 1.0,
+  feather: 0.5,
+  tintColor: null,        // null = 使用图片原色
+  useOriginalColor: true,
+  explosionForce: 300,
 };
 
-// Scene 设置
+// Scene 设置 — 深色背景
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111); // 深色背景
+
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
   1000
 );
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0x000000, 0);
 document.getElementById('canvas-container').appendChild(renderer.domElement);
 
 camera.position.z = 500;
@@ -97,23 +103,36 @@ function createParticles(data) {
     scene.remove(particles.mesh);
   }
 
+  const tintColor = config.useOriginalColor ? null : config.tintColor;
+
   particles = new ImageParticles({
     imageData: data,
     particleCount: config.particleCount,
     particleSize: config.particleSize,
     style: config.style,
     scene: scene,
+    tintColor: tintColor,
+    glowIntensity: config.glowIntensity,
+    feather: config.feather,
   });
+
+  // 更新统计显示
+  document.getElementById('particleStats').textContent = particles.particleCount || 0;
 
   // 初始化鼠标交互
   if (mouseInteraction) {
     mouseInteraction.setParticles(particles);
   } else {
-    mouseInteraction = new MouseInteraction(particles, config);
+    mouseInteraction = new MouseInteraction(particles, {
+      mouseForce: config.mouseForce,
+      explosionForce: config.explosionForce,
+    });
   }
 }
 
-// 控制面板事件
+// ===== 控制面板事件 =====
+
+// 风格
 document.querySelectorAll('input[name="style"]').forEach((radio) => {
   radio.addEventListener('change', (e) => {
     config.style = e.target.value;
@@ -121,30 +140,77 @@ document.querySelectorAll('input[name="style"]').forEach((radio) => {
   });
 });
 
+// 粒子数量
 document.getElementById('particleCount').addEventListener('input', (e) => {
   config.particleCount = parseInt(e.target.value);
   document.getElementById('particleCountValue').textContent = config.particleCount;
   if (imageData) createParticles(imageData);
 });
 
+// 粒子大小
 document.getElementById('particleSize').addEventListener('input', (e) => {
   config.particleSize = parseFloat(e.target.value);
   document.getElementById('particleSizeValue').textContent = config.particleSize.toFixed(1);
   if (particles) particles.updateSize(config.particleSize);
 });
 
+// 光晕强度
+document.getElementById('glowIntensity').addEventListener('input', (e) => {
+  config.glowIntensity = parseFloat(e.target.value);
+  document.getElementById('glowIntensityValue').textContent = config.glowIntensity.toFixed(1);
+  if (particles) particles.setGlowIntensity(config.glowIntensity);
+});
+
+// 羽化程度
+document.getElementById('feather').addEventListener('input', (e) => {
+  config.feather = parseFloat(e.target.value);
+  document.getElementById('featherValue').textContent = config.feather.toFixed(2);
+  if (particles) particles.setFeather(config.feather);
+});
+
+// 粒子颜色选择器
+document.getElementById('particleColor').addEventListener('input', (e) => {
+  config.tintColor = e.target.value;
+  if (!config.useOriginalColor && particles) {
+    particles.setTintColor(config.tintColor);
+  }
+});
+
+// 使用图片原色 复选框
+document.getElementById('useOriginalColor').addEventListener('change', (e) => {
+  config.useOriginalColor = e.target.checked;
+  const colorPicker = document.getElementById('particleColor');
+  colorPicker.disabled = config.useOriginalColor;
+  colorPicker.style.opacity = config.useOriginalColor ? '0.4' : '1';
+
+  if (imageData) {
+    // 需要重新创建粒子才能切换颜色模式
+    createParticles(imageData);
+  }
+});
+
+// 鼠标排斥力
 document.getElementById('mouseForce').addEventListener('input', (e) => {
   config.mouseForce = parseInt(e.target.value);
   document.getElementById('mouseForceValue').textContent = config.mouseForce;
   if (mouseInteraction) mouseInteraction.updateForce(config.mouseForce);
 });
 
+// 点击爆炸力度
+document.getElementById('explosionForce').addEventListener('input', (e) => {
+  config.explosionForce = parseInt(e.target.value);
+  document.getElementById('explosionForceValue').textContent = config.explosionForce;
+  if (mouseInteraction) mouseInteraction.setExplosionForce(config.explosionForce);
+});
+
+// 风力效果
 document.getElementById('windForce').addEventListener('input', (e) => {
   config.windForce = parseFloat(e.target.value);
   document.getElementById('windForceValue').textContent = config.windForce.toFixed(2);
   if (particles) particles.setWindForce(config.windForce);
 });
 
+// 动画速度
 document.getElementById('animationSpeed').addEventListener('input', (e) => {
   config.animationSpeed = parseFloat(e.target.value);
   document.getElementById('animationSpeedValue').textContent = config.animationSpeed.toFixed(1);
@@ -179,10 +245,6 @@ setInterval(() => {
   frameCount = 0;
   lastTime = now;
 }, 1000);
-
-if (particles) {
-  document.getElementById('particleStats').textContent = particles.particleCount || 0;
-}
 
 // 动画循环
 function animate() {
