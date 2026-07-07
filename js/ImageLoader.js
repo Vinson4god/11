@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export default class ImageLoader {
   async loadImage(file) {
     return new Promise((resolve, reject) => {
@@ -67,7 +69,7 @@ export default class ImageLoader {
           particles.push({
             x: px,
             y: py,
-            color: new (require('three')).Color(r / 255, g / 255, b / 255),
+            color: new THREE.Color(r / 255, g / 255, b / 255),
           });
         }
       }
