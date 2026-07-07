@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>粒子图片效果 - Particle Image Effect</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Canvas 容器 -->
+  <div id="canvas-container" class="canvas-container"></div>
+
+  <!-- 控制面板 -->
+  <div class="control-panel">
+    <!-- 上传区域 -->
+    <div class="upload-section">
+      <div id="dropZone" class="drop-zone">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <p>拖放图片或点击上传</p>
+        <input type="file" id="imageInput" accept="image/*" hidden>
+      </div>
+      <div id="imagePreview" class="image-preview" style="display: none;">
+        <img id="previewImg" src="" alt="preview">
+        <button id="changeImageBtn" class="btn-small">更换图片</button>
+      </div>
+    </div>
+
+    <!-- 分割线 -->
+    <div class="divider"></div>
+
+    <!-- 控制选项 -->
+    <div class="controls-section">
+      <h3>粒子参数</h3>
+
+      <!-- 粒子风格选择 -->
+      <div class="control-group">
+        <label>粒子风格</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="style" value="grid" checked>
+            <span>点阵风格</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="style" value="fluid">
+            <span>流体风格</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 粒子数量 -->
+      <div class="control-group">
+        <label for="particleCount">粒子数量: <span id="particleCountValue">5000</span></label>
+        <input type="range" id="particleCount" min="1000" max="20000" step="1000" value="5000" class="slider">
+      </div>
+
+      <!-- 粒子大小 -->
+      <div class="control-group">
+        <label for="particleSize">粒子大小: <span id="particleSizeValue">2.0</span></label>
+        <input type="range" id="particleSize" min="0.5" max="5" step="0.5" value="2.0" class="slider">
+      </div>
+
+      <!-- 鼠标作用力 -->
+      <div class="control-group">
+        <label for="mouseForce">鼠标作用力: <span id="mouseForceValue">100</span></label>
+        <input type="range" id="mouseForce" min="0" max="300" step="10" value="100" class="slider">
+      </div>
+
+      <!-- 风力效果 -->
+      <div class="control-group">
+        <label for="windForce">风力效果: <span id="windForceValue">0.05</span></label>
+        <input type="range" id="windForce" min="0" max="0.2" step="0.01" value="0.05" class="slider">
+      </div>
+
+      <!-- 动画速度 -->
+      <div class="control-group">
+        <label for="animationSpeed">动画速度: <span id="animationSpeedValue">1.0</span></label>
+        <input type="range" id="animationSpeed" min="0.1" max="2" step="0.1" value="1.0" class="slider">
+      </div>
+    </div>
+
+    <!-- 分割线 -->
+    <div class="divider"></div>
+
+    <!-- 操作按钮 -->
+    <div class="buttons-section">
+      <button id="resetBtn" class="btn btn-primary">重置粒子</button>
+      <button id="reformBtn" class="btn btn-secondary">重组图像</button>
+      <button id="exportBtn" class="btn btn-tertiary">导出截图</button>
+    </div>
+
+    <!-- 统计信息 -->
+    <div class="stats">
+      <p>FPS: <span id="fps">60</span></p>
+      <p>粒子数: <span id="particleStats">0</span></p>
+    </div>
+  </div>
+
+  <!-- 移动设备提示 -->
+  <div class="mobile-hint">
+    💡 建议在桌面设备上使用以获得最佳体验
+  </div>
+
+  <!-- 脚本 -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@r128/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
