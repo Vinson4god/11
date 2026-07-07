@@ -54,7 +54,7 @@
       <!-- 粒子数量 -->
       <div class="control-group">
         <label for="particleCount">粒子数量: <span id="particleCountValue">5000</span></label>
-        <input type="range" id="particleCount" min="1000" max="20000" step="1000" value="5000" class="slider">
+        <input type="range" id="particleCount" min="1000" max="40000" step="1000" value="5000" class="slider">
       </div>
 
       <!-- 粒子大小 -->
@@ -66,7 +66,7 @@
       <!-- 光晕强度 -->
       <div class="control-group">
         <label for="glowIntensity">光晕强度: <span id="glowIntensityValue">1.0</span></label>
-        <input type="range" id="glowIntensity" min="0.1" max="2" step="0.1" value="1.0" class="slider">
+        <input type="range" id="glowIntensity" min="0.1" max="4" step="0.1" value="1.0" class="slider">
       </div>
 
       <!-- 羽化程度 -->
@@ -120,6 +120,7 @@
       <button id="resetBtn" class="btn btn-primary">重置粒子</button>
       <button id="reformBtn" class="btn btn-secondary">重组图像</button>
       <button id="exportBtn" class="btn btn-tertiary">导出截图</button>
+      <button id="exportHTMLBtn" class="btn btn-export">导出HTML</button>
     </div>
 
     <!-- 统计信息 -->
