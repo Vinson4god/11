@@ -307,3 +307,122 @@ document.getElementById('exportHTMLBtn').addEventListener('click', async () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
+// ===== 导出组件功能 =====
+
+document.getElementById('exportComponentBtn').addEventListener('click', async () => {
+  if (!imageData) {
+    alert('请先上传图片');
+    return;
+  }
+
+  // 读取 ParticleEffectApp.js 并替换 three.js 导入为 CDN
+  const response = await fetch('js/ParticleEffectApp.js');
+  let componentCode = await response.text();
+  
+  // 替换本地 three.js 导入为 CDN 导入
+  componentCode = componentCode.replace(
+    "import * as THREE from './three.module.js';",
+    "import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';"
+  );
+
+  const exportConfig = {
+    particleCount: config.particleCount,
+    particleSize: config.particleSize,
+    style: config.style,
+    mouseForce: config.mouseForce,
+    windForce: config.windForce,
+    animationSpeed: config.animationSpeed,
+    glowIntensity: config.glowIntensity,
+    feather: config.feather,
+    tintColor: config.tintColor,
+    useOriginalColor: config.useOriginalColor,
+    explosionForce: config.explosionForce,
+  };
+
+  // 生成 particle-effect.js (ES Module 库)
+  const libraryCode = componentCode;
+
+  // 生成 embed-example.html (使用示例)
+  const exampleHTML = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的网站 - 粒子效果嵌入示例</title>
+<style>
+  /* 你的网站样式 */
+  body { font-family: sans-serif; margin: 0; background: #1a1a2e; }
+  .navbar { background: #16213e; padding: 1rem 2rem; color: white; }
+  .content { padding: 2rem; color: #e0e0e0; }
+  
+  /* 粒子容器 - 可以放在任何地方 */
+  #particle-container {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    background: #0f0f0f;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+</style>
+<!-- Import Map: 必须先定义 Three.js -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+  <nav class="navbar">
+    <h1>我的网站</h1>
+  </nav>
+  <div class="content">
+    <h2>欢迎来到我的网站</h2>
+    <p>下面是一个嵌入的粒子效果：</p>
+    
+    <!-- 粒子效果容器 -->
+    <div id="particle-container"></div>
+    
+    <p>更多内容...</p>
+  </div>
+
+  <!-- 嵌入粒子效果 -->
+  <script type="module">
+    import { ParticleEffectApp } from './particle-effect.js';
+    
+    const app = new ParticleEffectApp({
+      container: document.getElementById('particle-container'),
+      imageSrc: '${imageData.dataURL}',
+      options: ${JSON.stringify(exportConfig, null, 2)}
+    });
+    
+    // 可选：5秒后改变配置
+    // setTimeout(() => app.setOption('particleCount', 10000), 5000);
+  </script>
+</body>
+</html>`;
+
+  // 下载两个文件
+  const libBlob = new Blob([libraryCode], { type: 'application/javascript' });
+  const libUrl = URL.createObjectURL(libBlob);
+  const libA = document.createElement('a');
+  libA.href = libUrl;
+  libA.download = 'particle-effect.js';
+  libA.click();
+  URL.revokeObjectURL(libUrl);
+
+  const exampleBlob = new Blob([exampleHTML], { type: 'text/html' });
+  const exampleUrl = URL.createObjectURL(exampleBlob);
+  const exampleA = document.createElement('a');
+  exampleA.href = exampleUrl;
+  exampleA.download = 'embed-example.html';
+  exampleA.click();
+  URL.revokeObjectURL(exampleUrl);
+
+  // 显示提示
+  alert('已下载两个文件：\n1. particle-effect.js - 组件库\n2. embed-example.html - 使用示例\n\n在你的网站中引入 importmap 和 particle-effect.js 即可使用。');
+});
