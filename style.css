@@ -321,6 +321,17 @@ body {
   box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
 }
 
+.btn-component {
+  background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.25);
+}
+
+.btn-component:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(236, 72, 153, 0.35);
+}
+
 .btn-export:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 24px rgba(99, 102, 241, 0.35);
